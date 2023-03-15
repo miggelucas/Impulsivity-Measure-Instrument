@@ -2,14 +2,12 @@ library(readr)
 library(psych)
 library(lavaan)
 library(stringr)
-
-
-## LUCAS ESTEVE AQYU
-
-## Emanuel está aqui
+library(tidyverse)
+library(readxl)
 
 # importando dados
 df <- read_csv("Construção de Instrumentos 2022.2 (respostas) - Respostas ao formulário 1-3.csv")
+df <- read_xlsx("Construção de Instrumentos 2022.2 (respostas).xlsx")
 
 # saparando intrumetnos de impulsividade
 df_impulsividade <- df[, 10:51] 
@@ -33,7 +31,6 @@ bartlett <- bartlett.test(df_impulsividade)
 
 # amostra possui bons indicadores para prosseguir na análise
 
-
 # Extração de fatores
 
 fa_parallel <- fa.parallel(df_impulsividade, fa = "fa", cor = "poly", fm = "wls")
@@ -51,6 +48,11 @@ efa$loadings
 
 cargas_fatorias <- fa.sort(efa$loadings)
 cargas_fatorias
+
+# Itens que seriam removidos em uma análise visual
+# Item 20
+# Item 35
+# Item 33
 
 cargas_fatorias[,1][abs(cargas_fatorias[,1]) > 0.3]
 # item 5 removido
