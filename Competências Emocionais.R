@@ -4,6 +4,7 @@ library(readr)
 library(dplyr)
 library(readxl)
 library(psych)
+library(lavaan)
 
 HSE_AP <- read_excel("HSE_AP.xlsx")
 
@@ -41,8 +42,8 @@ df_referencia <- HSE_AP[,12:45]
 # itens invertidos NÃO CORRIGEM index
 cf1_index <- c(12,16,19,26,34,37,40,42) - 11
 cf2_index <- c(15,22,25,16 + 11,32,35,38) - 11
-cf3_index <-  c(17,19,28 + 11,43) - 11
-cf4_index <-c(13,18,21,23,30,33,44) - 11
+cf3_index <- c(17,19,28 + 11,43) - 11
+cf4_index <- c(13,18,21,23,30,33,44) - 11
 cf5_index <- c(3 + 11, 20,24,31,36,45) - 11
 
 cf_geral_index <- c(cf1_index, cf2_index, cf3_index, cf4_index, cf5_index)
@@ -92,8 +93,58 @@ alpha(df_competencias_emocionais %>% select(cf_geral_index))
 # 0.88
 
 
-df_escores <- df_competencias_emocionais %>% select("cf1", "cf2", "cf3", "cf4", "cf5", "cf_geral")
 
-df_escores
-write.csv(df_escores, "Escores Competências Emocionais", row.names=FALSE)
+# Análise epxlortaria
+
+df_efa <- df[,52:85]
+
+num_columns <- ncol(df_efa)
+
+new_names <- character()
+for (i in 1:num_columns) {
+  new_names[i] <- paste0("ce", i)
+}
+colnames(df_efa) <- new_names
+
+efa <- fa(df_efa, nfactors = 5, rotate = "oblimin", fm = "wls")
+fa.sort(efa$loadings)
+
+cf3_analise_index <- c(6, 18, 28, 32)
+cf5_análise_index <- c(3, 13, 20, 25, 30) 
+
+tens_invertidos_index <- c(3, 16, 28)
+
+for (index in itens_invertidos_index) {
+  df_efa[, index] <- 6 - df_efa[, index]
+}
+
+df_cf3_analise <- df_efa %>% select(cf3_analise_index)
+df_cf5_analise <- df_efa %>% select(cf5_análise_index)
+
+alpha(df_cf3_analise)
+# alpha 0.73
+alpha(df_cf5_analise)
+# alpha 0.61
+
+
+cf1_index
+# 1  5  8 15 23 26 29 31
+cf2_index
+# 4 11 14 16 21 24 27
+cf3_index
+# 6  18 28 32
+cf4_index
+# 2  7 10 12 19 22 33
+cf5_análise
+# 3 13 20 25 30
+
+
+
+
+
+#####
+#df_escores <- df_competencias_emocionais %>% select("cf1", "cf2", "cf3", "cf4", "cf5", "cf_geral")
+
+#df_escores
+#write.csv(df_escores, "Escores Competências Emocionais", row.names=FALSE)
 
