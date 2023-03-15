@@ -6,6 +6,8 @@ library(stringr)
 
 ## LUCAS ESTEVE AQYU
 
+## Emanuel está aqui
+
 # importando dados
 df <- read_csv("Construção de Instrumentos 2022.2 (respostas) - Respostas ao formulário 1-3.csv")
 
