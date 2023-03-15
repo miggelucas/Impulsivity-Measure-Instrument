@@ -6,9 +6,9 @@ library(readxl)
 library(psych)
 library(lavaan)
 
-HSE_AP <- read_excel("HSE_AP.xlsx")
+HSE_AP <- read_excel("Base de dados/HSE_AP.xlsx")
 
-df <- read_csv("database.csv")
+df <- read_csv("Base de dados/database.csv")
 
 # duas pessoas não aceitarm participar da pesquisa
 df <- na.omit(df)
