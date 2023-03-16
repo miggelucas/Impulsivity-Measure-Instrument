@@ -5,6 +5,8 @@ library(stringr)
 library(tidyverse)
 library(readxl)
 
+# Testando Emanuel
+
 # importando dados
 df <- read_csv("Construção de Instrumentos 2022.2 (respostas) - Respostas ao formulário 1-3.csv")
 df <- read_xlsx("Construção de Instrumentos 2022.2 (respostas).xlsx")
