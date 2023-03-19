@@ -5,7 +5,6 @@ library(stringr)
 library(tidyverse)
 library(readxl)
 
-# Testando Emanuel
 
 # importando dados
 df <- read_csv("Construção de Instrumentos 2022.2 (respostas) - Respostas ao formulário 1-3.csv")
@@ -106,43 +105,23 @@ print(numeros)
 
 # Paralell analysis
 
-poly_im <- df_impulsividade %>% polychoric(.)   # matriz de correlações policóricas para análise paralela.
+poly_im <- df_impulsividade_2 %>% polychoric(.)   # matriz de correlações policóricas para análise paralela.
 rho_im <- poly_im$rho # guardando apenas o Rho de Spearman da matriz de correlações policóricas
 scree_im<-scree(poly_im)
 
-pa_R <- fa.parallel(rho_im, n.obs=830, fa="fa") # análise paralela sobre a matriz de correlações policóricas
+pa_R <- fa.parallel(rho_im, n.obs=828, fa="fa") # análise paralela sobre a matriz de correlações policóricas
 pa_R$fa.values #mostra os eigenvalues com os dados experimentais
 pa_R$fa.sim #mostra os eigenvalues com os dados simulados
 
-# OBS.: a análise paralela indicou 6 fatores, o scree-plot 3 ou 4 fatores,
-# e pelo critério de Kaiser-Guttman (eigenvalue > 1), formariam-se quatro fatores.
-# Assim, optou-se pela extração de 4 fatores.
 
 # Fatores
-names(R_2)
-r_efa <- fa(R, nfactors = '4', cor='poly', 
-            fm='wls', rotate = 'geominQ')
-# nessa analise, o item 7 apresentou cargas inferiores a 0,3 em todos os fatores.
-
-R <- R[ ,c(1:6,8:24)]
-
-r_efa <- fa(R, nfactors = '4', cor='poly', 
+im_efa <- fa(df_impulsividade_2, nfactors = '4', cor='poly', 
             fm='wls', rotate = 'geominQ')
 
-r_efa$e.values
-# resultados em tabelas
-names (r_efa)
-r_efa$loadings
+im_efa$e.values
+im_efa$loadings
 
-#install.packages("DT")  # pacote para fazer tabelas.
-#library(DT)
-#view(R)
-
-#datatable(r_itens$loadings[1:23, 1:3], rownames=TRUE, editable = TRUE) 
 
 library(knitr)  #pacote para tabelas
 kable(r_efa$loadings[1:23, 1:4],digits = 2)
 
-#R-Fidedignidade
-#names(riasec_2)
-#riasec_2 %>% select(24:29,36,41:43,45) %>% alpha()
