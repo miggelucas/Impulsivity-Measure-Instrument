@@ -121,7 +121,24 @@ im_efa <- fa(df_impulsividade_2, nfactors = '4', cor='poly',
 im_efa$e.values
 im_efa$loadings
 
+# Fatores
+im_efa_2 <- fa(df_impulsividade_2, nfactors = '3', cor='poly', 
+             fm='wls', rotate = 'geominQ')
 
-library(knitr)  #pacote para tabelas
-kable(r_efa$loadings[1:23, 1:4],digits = 2)
+im_efa_2$e.values
+im_efa_2$loadings %>% view()
+
+# Fatores
+im_efa_3 <- fa(df_impulsividade_2, nfactors = '6', cor='poly', 
+             fm='wls', rotate = 'geominQ')
+
+im_efa_3$e.values
+im_efa_3$loadings %>% view()
+
+# Fatores
+im_efa_4 <- fa(df_impulsividade_2, nfactors = '7', cor='poly', 
+             fm='wls', rotate = 'geominQ')
+
+im_efa_4$e.values
+im_efa_4$loadings
 
