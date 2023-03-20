@@ -15,6 +15,7 @@ library(readr)
 library(dplyr)
 library(readxl)
 library(psych)
+library(lavaan)
 ```
 
 ## R Markdown
@@ -42,7 +43,7 @@ df_competencias_emocionais <- df[,52:85]
 
 HSE_AP <- read_excel("Base de dados/HSE_AP.xlsx")
 
-colnames(HSE_AP)
+#colnames(HSE_AP)
 df_referencia <- HSE_AP[,12:45]
 
 
@@ -79,6 +80,8 @@ cf_geral_index <- c(cf1_index, cf2_index, cf3_index, cf4_index, cf5_index)
 
 # EFA
 
+Com base no que pude observar, existiam dúvidas sobre a real estrutura dos dados. A melhor maneira de resolver esses questionamentos é refazendo as análises e reintrepretando os fatores encontrados.
+
 ```{r}
 # separando novo dataframe
 df_efa <- df[,52:85]
@@ -106,15 +109,26 @@ print(KMO(df_efa))
 print(bartlett.test(df_efa))
 ```
 
+O valor KMO de 0.91 indica que a nossa amostra possui bons indicadores para ser aplicada uma análise fatorial.
+
+No entanto, quantos fatores devemos extrair? 3? 5? Não podemos assumir que os dados se organizam conforme o modelo teórico ou, muito menos, chutar um valor da nossa cabeça. Precisamos observar alguns indicadores para poder tomar a decisão quanto ao número de fatores a serem extraídos.
+
 ```{r}
 plot(fa.parallel(df_efa, fm = "wls", fa = "fa"))
 ```
 
 ```{r}
+efa5 <- fa(df_efa, nfactors = 5, rotate = "oblimin", fm = "wls", cor = "poly")
+efa4 <- fa(df_efa, nfactors = 4, rotate = "oblimin", fm = "wls", cor = "poly")
 
-efa <- fa(df_efa, nfactors = 4, rotate = "oblimin", fm = "wls", cor = "poly")
-efa$values
+print("autovalores para modelo com 4 fatores")
+print(efa4$values)
+
+print("autovalores para modelo com 5 fatores")
+print(efa5$values)
 ```
+
+Quando observamos observamos que indepedente do modelo ser com 4 ou 5 fatores, apenas 4 fatores apresentam autovalores acima de 1. A técnica de scree plot se mostra dúbia entre 4 ou 5 fatores. O valor reduzido para o 5 autovalor se mostrou determinante nessa análise para a escolha de extração de 4 fatores.
 
 ```{r}
 efa_loadings <- efa$loadings
@@ -122,7 +136,7 @@ print(fa.sort(efa_loadings))
 ```
 
 ```{r}
-cf1_index_efa <- c(1, 8, 15, 23, 26,29, 31)
+cf1_index_efa <- c(1, 8, 15, 23, 26, 29, 31)
 efa_loadings[,1][abs(efa_loadings[,1]) > 0.38]
 ```
 
@@ -144,6 +158,24 @@ efa_loadings[,4][abs(efa_loadings[,4]) > 0.38]
 
 ```
 
+```{r CFA}
+
+modelo_cfa <- 'f1 =~ ce1 + ce8 + ce15 + ce23 + ce26 + ce29 + ce31 
+               f2 =~ ce3 + ce4  + ce11 + ce13 + ce14 + ce16 + ce21 + ce24 + ce25 + ce27
+               f3 =~ ce2 + ce5 + ce7 + ce9 + ce10 + ce12 + ce17 + ce19 + ce22 + ce33 
+               f4 =~ ce6 + ce18 + ce28 + ce32'
+
+cf_geral_index_efa <- c(cf1_index_efa, cf2_index_efa, cf3_index_efa, cf4_index_efa)
+df_cfa <- df_efa %>% select(cf_geral_index_efa)
+
+cfa <- cfa(df_cfa, model = modelo_cfa)
+summary(cfa, fit.measures = TRUE, standardized = TRUE)
+```
+
+Temos alguns parametros para podermos observar para poder julgar se o modelo está aceitável ou não. Em termos comparativos com modelos de base, o modelo de 4 fatores não apresenta os parametros necessários para ser aceito (\>= 0.95) para os indicadores CFI (0.862) e TLI (0.850). No entanto, indicam que estamos no caminho certo. Por outro lado, conseguimos bons indicadores de para residuos com RMSEA \< 0.9 e SMSR menor que 0.6. Nosso modelo não é dos melhores, mas pode apresentar a validade aceitável para que a gente possa usa-lo para correlacionar com os estudos de Impulsividade
+
+## Avaliando Construtos
+
 ```{r}
 cf_geral_index_efa <- c(cf1_index_efa, cf2_index_efa, cf3_index_efa, cf4_index_efa)
 
@@ -163,8 +195,6 @@ df_cf3_efa <- df_competencias_emocionais_efa %>% select(cf3_index_efa)
 df_cf4_efa <- df_competencias_emocionais_efa %>% select(cf4_index_efa)
 df_cf_geral_efa <- df_competencias_emocionais_efa %>% select(cf_geral_index_efa)
 ```
-
-## Avaliando Construtos
 
 ```{r}
 colnames(df_cf1_efa)
@@ -244,8 +274,4 @@ df_competencias_emocionais$cf4 <- rowMeans(df_cf4)
 df_competencias_emocionais$cf5 <- rowMeans(df_cf5)
 
 df_competencias_emocionais$cf_geral <- df_competencias_emocionais %>% select(cf_geral_index) %>% rowMeans()
-```
-
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
