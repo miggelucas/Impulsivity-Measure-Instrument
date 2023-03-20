@@ -1,0 +1,251 @@
+---
+title: "Revisando Competências Emocionais"
+author: "Lucas Migge"
+date: "2023-03-19"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+library(readr)
+library(dplyr)
+library(readxl)
+library(psych)
+```
+
+## R Markdown
+
+```{r}
+# importando dados para uma variável
+df <- read_csv("Base de dados/database.csv")
+
+# nossa planilha exigia respostas em todas as perguntas, por isso podemos assumir que não haverá dados missing
+# Algumas pessoas podem ter clicado em "Não desejo participar", por isso preciamos limpar esses dados
+# duas pessoas não aceitarm participar da pesquisa
+df <- na.omit(df)
+head(df)
+```
+
+```{r}
+
+colnames(df)
+# podemos conferir que o inventário de competências emocionais começa na coluna 52 e vai até a 85
+df_competencias_emocionais <- df[,52:85]
+```
+
+```{r}
+# Conferindo dados de referência
+
+HSE_AP <- read_excel("Base de dados/HSE_AP.xlsx")
+
+colnames(HSE_AP)
+df_referencia <- HSE_AP[,12:45]
+
+
+# df_geral <- df_geral %>% rename(C3 = 'Por mais que tente, não consigo controlar a expressão do que estou sentindo.')
+# df_geral <- df_geral %>% rename(C16 = 'Frustrações deixam-me desanimado/a por bastante tempo.')
+# df_geral <- df_geral %>% rename(C28 = 'Tenho vergonha de expressar os meus sentimentos.')
+
+# os itens 3, 16 e 28 precisam ser invertidos
+
+# df_geral$CF1 <- df_geral %>% select(12,16,19,26,34,37,40,42) %>% rowMeans()
+# df_geral$CF2 <- df_geral %>% select(15,22,25,137,32,35,38) %>% rowMeans()
+# df_geral$CF3 <- df_geral %>% select(17,19,138,43) %>% rowMeans()
+# df_geral$CF4 <- df_geral %>% select(13,18,21,23,30,33,44) %>% rowMeans()
+# df_geral$CF5 <- df_geral %>% select(136,20,24,28,31,36,45) %>% rowMeans()
+# df_geral$C_GERAL <- df_geral %>% select(139:143) %>% rowMeans()
+
+# o item 28 (interido em 138) aparece tanto no CF5 quanto CF3?
+```
+
+```{r}
+# itens invertidos NÃO CORRIGEM index
+cf1_index <- c(12,16,19,26,34,37,40,42) - 11
+cf2_index <- c(15,22,25,16 + 11,32,35,38) - 11
+cf3_index <- c(17,19,28 + 11,43) - 11
+cf4_index <- c(13,18,21,23,30,33,44) - 11
+cf5_index <- c(3 + 11, 20,24,31,36,45) - 11
+
+# percebendo que o item 28 irá aparecer no cf1 e no cf3
+# refazer a análise fatorial se mostra válido para tirar dúvidas quanto a estrutura dos fatores
+
+cf_geral_index <- c(cf1_index, cf2_index, cf3_index, cf4_index, cf5_index)
+
+```
+
+# EFA
+
+```{r}
+# separando novo dataframe
+df_efa <- df[,52:85]
+
+# trabalhar com as colunas padronizadas pode se mostrar problemático
+# renomeando nomes das colunas
+
+# número de colunas
+num_columns <- ncol(df_efa)
+
+# laço para criar e manter novos nomes
+new_names <- character()
+for (i in 1:num_columns) {
+  new_names[i] <- paste0("ce", i)
+}
+
+# renomando colunas
+colnames(df_efa) <- new_names
+```
+
+```{r KMO}
+
+# verificando adequabilidade para análise
+print(KMO(df_efa))
+print(bartlett.test(df_efa))
+```
+
+```{r}
+plot(fa.parallel(df_efa, fm = "wls", fa = "fa"))
+```
+
+```{r}
+
+efa <- fa(df_efa, nfactors = 4, rotate = "oblimin", fm = "wls", cor = "poly")
+efa$values
+```
+
+```{r}
+efa_loadings <- efa$loadings
+print(fa.sort(efa_loadings))
+```
+
+```{r}
+cf1_index_efa <- c(1, 8, 15, 23, 26,29, 31)
+efa_loadings[,1][abs(efa_loadings[,1]) > 0.38]
+```
+
+```{r}
+# removendo o item 30. Apresentou carga significariva com fator 3 tbm
+cf2_index_efa <- c(3, 4, 11, 13, 14, 16, 21, 24, 25, 27)
+efa_loadings[,2][abs(efa_loadings[,2]) > 0.38]
+```
+
+```{r}
+# removendo o item 30. Apresentou carga significariva com fator 2 tbm
+cf3_index_efa <- c(2, 5, 7, 9, 10, 12, 17, 19 ,22, 33)
+efa_loadings[,3][abs(efa_loadings[,3]) > 0.38]
+```
+
+```{r}
+cf4_index_efa <- c(6, 18, 28, 32)
+efa_loadings[,4][abs(efa_loadings[,4]) > 0.38]
+
+```
+
+```{r}
+cf_geral_index_efa <- c(cf1_index_efa, cf2_index_efa, cf3_index_efa, cf4_index_efa)
+
+df_competencias_emocionais_efa <- df_competencias_emocionais
+
+itens_invertidos_index <- c(3, 16, 28)
+
+for (index in itens_invertidos_index) {
+  df_competencias_emocionais_efa[, index] <- 6 - df_competencias_emocionais_efa[, index]
+}
+```
+
+```{r}
+df_cf1_efa <- df_competencias_emocionais_efa %>% select(cf1_index_efa)
+df_cf2_efa <- df_competencias_emocionais_efa %>% select(cf2_index_efa)
+df_cf3_efa <- df_competencias_emocionais_efa %>% select(cf3_index_efa)
+df_cf4_efa <- df_competencias_emocionais_efa %>% select(cf4_index_efa)
+df_cf_geral_efa <- df_competencias_emocionais_efa %>% select(cf_geral_index_efa)
+```
+
+## Avaliando Construtos
+
+```{r}
+colnames(df_cf1_efa)
+```
+
+```{r}
+alpha_cf1_efa <- alpha(df_cf1_efa)
+print(paste("Alpha para esse fator 1: ", alpha_cf1_efa$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_cf1_efa$alpha.drop$raw_alpha)
+```
+
+Para o primeiro fator podemos interpretar que se trata de Regulações de Emoções em outras pessoas. Além disso, possui bons índeces de precisão
+
+```{r}
+colnames(df_cf2_efa)
+```
+
+```{r echo=TRUE, message=FALSE, paged.print=FALSE}
+alpha_cf2_efa <- alpha(df_cf2_efa)
+print(paste("Alpha para esse fator 2: ", alpha_cf2_efa$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_cf2_efa$alpha.drop$raw_alpha)
+
+```
+
+Para o segundo fator podemos interpretar que se trata de Regulação de Emoções em sí mesmo (talvez de emoções de baixa potência. Também apresenta bons índicies de precisão. Não se ve a necessidade de droppar itens para aumentar a precisão
+
+```{r}
+colnames(df_cf3_efa)
+```
+
+```{r}
+alpha_cf3_efa <- alpha(df_cf3_efa)
+print(paste("Alpha para esse fator 3: ", alpha_cf3_efa$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_cf3_efa$alpha.drop$raw_alpha)
+```
+
+O terceiro fator parece ligado a percepção de Emoções, envolvendo algum aspecto de compreensão também. Bons indicadores de precisão. Drop de itens não se mostra relevante
+
+```{r}
+colnames(df_cf4_efa)
+```
+
+```{r}
+alpha_cf4_efa <- alpha(df_cf4_efa)
+print(paste("Alpha para esse fator 4: ", alpha_cf4_efa$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_cf4_efa$alpha.drop$raw_alpha)
+```
+
+Fator relacionado a Expressão de Emoções. Possui indices aceitáveis de precisão
+
+```{r}
+
+alpha_cf_geral_efa <- alpha(df_cf_geral_efa)
+print(paste("Alpha para esse fator geral: ", alpha_cf_geral_efa$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_cf_geral_efa$alpha.drop$raw_alpha)
+```
+
+Fator geral apresenta bons indices de precisão
+
+Foi avaliado também a situação
+
+```{r}
+df_competencias_emocionais$cf1 <- rowMeans(df_cf1)
+df_competencias_emocionais$cf2 <- rowMeans(df_cf2)
+df_competencias_emocionais$cf3 <- rowMeans(df_cf3)
+df_competencias_emocionais$cf4 <- rowMeans(df_cf4)
+df_competencias_emocionais$cf5 <- rowMeans(df_cf5)
+
+df_competencias_emocionais$cf_geral <- df_competencias_emocionais %>% select(cf_geral_index) %>% rowMeans()
+```
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
