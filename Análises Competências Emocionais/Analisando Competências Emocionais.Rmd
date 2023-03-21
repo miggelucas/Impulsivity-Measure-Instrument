@@ -24,6 +24,32 @@ Assim como no instrumento de Impulsividade, precisamos medir os escores dos fato
 
 Dessa forma, buscando respeitar os estudos anteriores, essa medição gerará duas bases de dados com escores para cada fator, um buscando seguir o modelo sugerido no estudo anterior, e outro seguindo parametros mais rigorosos de ajuste e precisão.
 
+## Resumindo os fatores
+
+-   Fator 1 - Regulacão de Emoções em Outros (REO)
+
+    -   Alpha = 0.878
+
+-   Fator 2 - Regulação de Emoções em si mesmo de Baixa Potência (RESBP)
+
+    -   Alpha = 0.837
+
+-   Fator 3 - Expressão de Emoções (EE)
+
+    -   Alpha = 0.734
+
+-   Fator 4 - Percepção de Emoções (PE)
+
+    -   Alpha = 0.771
+
+-   Fator 5 - Regulação de Emoções em si mesmo de Alta Potência (RESAP)
+
+    -   Alpha = 0.618
+
+-   Fator geral - Competência Emocional Geral (CEG)
+
+    -   Alpha = 0.889
+
 Ao final, haverá um resumo da precisão e conteúdo dos fatores para cada modelo, como forma de embasar e dar mais possibilidades para os estudos que iremos realizar mais a diante.
 
 ```{r}
@@ -320,23 +346,33 @@ print(alpha_cf_geral_novo$alpha.drop$raw_alpha)
 
 -   Fator 1 - Regulacão de Emoções em Outros (REO)
 
+    -   Envolve a capacidade de regulaçar emoções em outras pessoas, seja para diminuirem a sua excitação ou emocional para lhe motivarem.
+
     -   Alpha = 0.878
 
 -   Fator 2 - Regulação de Emoções em si mesmo de Baixa Potência (RESBP)
+
+    -   Envolve a capacidade do sujeito de regular as emoções de baixa intesidade. Mais especificamente, com emoções que diminuem a energia do sujeito, como tristeza e desmotivação.
 
     -   Alpha = 0.837
 
 -   Fator 3 - Expressão de Emoções (EE)
 
-    -   Alpha = 0.734
+    -   Envolve a capacidade do sujeito de Expressar as suas emoções para si mesmo e para mundo.
+
+        -   Alpha = 0.734
 
 -   Fator 4 - Percepção de Emoções (PE)
 
-    -   Alpha = 0.771
+    -   Envolve a capacidade do sujeito de indentificar emocões, percebendo suas características e suas consequências (?), seja em si ou em outras pessoas.
+
+        -   Alpha = 0.771
 
 -   Fator 5 - Regulação de Emoções em si mesmo de Alta Potência (RESAP)
 
-    -   Alpha = 0.618
+    -   Envolve a capacidade do sujeito de regular as emoções mais energéticas, como raiva, excitação excessiva.
+
+        -   Alpha = 0.618
 
 -   Fator geral - Competência Emocional Geral (CEG)
 
@@ -360,8 +396,6 @@ escores_5fatores
 
 write.csv(escores_5fatores, "Base de dados/Escores Competências Emocionais.csv", row.names=TRUE)
 ```
-
-# !! Trabalhando ainda !!
 
 # Testando outra EFA
 
@@ -399,165 +433,27 @@ O valor KMO de 0.91 indica que a nossa amostra possui bons indicadores para ser 
 No entanto, quantos fatores devemos extrair? 3? 5? Não podemos assumir que os dados se organizam conforme o modelo teórico ou, muito menos, chutar um valor da nossa cabeça. Precisamos observar alguns indicadores para poder tomar a decisão quanto ao número de fatores a serem extraídos.
 
 ```{r}
-plot(fa.parallel(df_efa, fm = "wls", fa = "fa"))
+plot(fa.parallel(df_efa, fm = "wls", fa = "fa", cor = "poly"))
 ```
 
 ```{r}
-efa6 <- fa(df_efa, nfactors = 6, rotate = "oblimin", fm = "wls")
+efa6 <- fa(df_efa, nfactors = 6, rotate = "oblimin", fm = "wls", cor = "poly")
 
 print("autovalores para modelo com 6 fatores")
-print(efa4$e.values)
-efa4$va
+print(efa6$e.values)
 ```
 
-Quando observamos observamos que indepedente do modelo ser com 4 ou 5 fatores, apenas 4 fatores apresentam autovalores acima de 1. A técnica de scree plot se mostra dúbia entre 4 ou 5 fatores. O valor reduzido para o 5 autovalor se mostrou determinante nessa análise para a escolha de extração de 4 fatores.
+Análises paralelas indicam 6 fatores, Scree plot é meio confuso, Autovalores indicam 6
 
 ```{r}
 summary(efa6)
 ```
+
+Apresenta bons indicadores de ajuste, com indicadores de resíduos adequados. TLI levemente abaixo da casa dos 0.900
 
 ```{r}
 efa_loadings <- efa6$loadings
 fa.sort(efa_loadings)
 ```
 
-```{r}
-cf1_index_efa <- c(1, 8, 15, 23, 26, 29, 31)
-efa_loadings[,1][abs(efa_loadings[,1]) > 0.38]
-```
-
-```{r}
-# removendo o item 30. Apresentou carga significariva com fator 3 tbm
-cf2_index_efa <- c(3, 4, 11, 13, 14, 16, 21, 24, 25, 27)
-efa_loadings[,2][abs(efa_loadings[,2]) > 0.38]
-```
-
-```{r}
-# removendo o item 30. Apresentou carga significariva com fator 2 tbm
-cf3_index_efa <- c(2, 5, 7, 9, 10, 12, 17, 19 ,22, 33)
-efa_loadings[,3][abs(efa_loadings[,3]) > 0.38]
-```
-
-```{r}
-cf4_index_efa <- c(6, 18, 28, 32)
-efa_loadings[,4][abs(efa_loadings[,4]) > 0.38]
-
-```
-
-```{r CFA}
-
-modelo_cfa <- 'f1 =~ ce1 + ce8 + ce15 + ce23 + ce26 + ce29 + ce31 
-               f2 =~ ce3 + ce4  + ce11 + ce13 + ce14 + ce16 + ce21 + ce24 + ce25 + ce27
-               f3 =~ ce2 + ce5 + ce7 + ce9 + ce10 + ce12 + ce17 + ce19 + ce22 + ce33 
-               f4 =~ ce6 + ce18 + ce28 + ce32'
-
-cf_geral_index_efa <- c(cf1_index_efa, cf2_index_efa, cf3_index_efa, cf4_index_efa)
-df_cfa <- df_efa %>% select(cf_geral_index_efa)
-
-cfa <- cfa(df_cfa, model = modelo_cfa)
-summary(cfa, fit.measures = TRUE, standardized = TRUE)
-```
-
-Temos alguns parametros para podermos observar para poder julgar se o modelo está aceitável ou não. Em termos comparativos com modelos de base, o modelo de 4 fatores não apresenta os parametros necessários para ser aceito (\>= 0.95) para os indicadores CFI (0.862) e TLI (0.850). No entanto, indicam que estamos no caminho certo. Por outro lado, conseguimos bons indicadores de para residuos com RMSEA \< 0.9 e SMSR menor que 0.6. Nosso modelo não é dos melhores, mas pode apresentar a validade aceitável para que a gente possa usa-lo para correlacionar com os estudos de Impulsividade
-
-## Avaliando Construtos
-
-```{r}
-cf_geral_index_efa <- c(cf1_index_efa, cf2_index_efa, cf3_index_efa, cf4_index_efa)
-
-df_competencias_emocionais_efa <- df_competencias_emocionais
-
-itens_invertidos_index <- c(3, 16, 28)
-
-for (index in itens_invertidos_index) {
-  df_competencias_emocionais_efa[, index] <- 6 - df_competencias_emocionais_efa[, index]
-}
-```
-
-```{r}
-df_cf1_efa <- df_competencias_emocionais_efa %>% select(cf1_index_efa)
-df_cf2_efa <- df_competencias_emocionais_efa %>% select(cf2_index_efa)
-df_cf3_efa <- df_competencias_emocionais_efa %>% select(cf3_index_efa)
-df_cf4_efa <- df_competencias_emocionais_efa %>% select(cf4_index_efa)
-df_cf_geral_efa <- df_competencias_emocionais_efa %>% select(cf_geral_index_efa)
-```
-
-```{r}
-colnames(df_cf1_efa)
-```
-
-```{r}
-alpha_cf1_efa <- alpha(df_cf1_efa)
-print(paste("Alpha para esse fator 1: ", alpha_cf1_efa$total$raw_alpha))
-
-print("Alpha em caso de drop do item no Index I: ")
-print(alpha_cf1_efa$alpha.drop$raw_alpha)
-```
-
-Para o primeiro fator podemos interpretar que se trata de Regulações de Emoções em outras pessoas. Além disso, possui bons índeces de precisão
-
-```{r}
-colnames(df_cf2_efa)
-```
-
-```{r echo=TRUE, message=FALSE, paged.print=FALSE}
-alpha_cf2_efa <- alpha(df_cf2_efa)
-print(paste("Alpha para esse fator 2: ", alpha_cf2_efa$total$raw_alpha))
-
-print("Alpha em caso de drop do item no Index I: ")
-print(alpha_cf2_efa$alpha.drop$raw_alpha)
-
-```
-
-Para o segundo fator podemos interpretar que se trata de Regulação de Emoções em sí mesmo (talvez de emoções de baixa potência. Também apresenta bons índicies de precisão. Não se ve a necessidade de droppar itens para aumentar a precisão
-
-```{r}
-colnames(df_cf3_efa)
-```
-
-```{r}
-alpha_cf3_efa <- alpha(df_cf3_efa)
-print(paste("Alpha para esse fator 3: ", alpha_cf3_efa$total$raw_alpha))
-
-print("Alpha em caso de drop do item no Index I: ")
-print(alpha_cf3_efa$alpha.drop$raw_alpha)
-```
-
-O terceiro fator parece ligado a percepção de Emoções, envolvendo algum aspecto de compreensão também. Bons indicadores de precisão. Drop de itens não se mostra relevante
-
-```{r}
-colnames(df_cf4_efa)
-```
-
-```{r}
-alpha_cf4_efa <- alpha(df_cf4_efa)
-print(paste("Alpha para esse fator 4: ", alpha_cf4_efa$total$raw_alpha))
-
-print("Alpha em caso de drop do item no Index I: ")
-print(alpha_cf4_efa$alpha.drop$raw_alpha)
-```
-
-Fator relacionado a Expressão de Emoções. Possui indices aceitáveis de precisão
-
-```{r}
-
-alpha_cf_geral_efa <- alpha(df_cf_geral_efa)
-print(paste("Alpha para esse fator geral: ", alpha_cf_geral_efa$total$raw_alpha))
-
-print("Alpha em caso de drop do item no Index I: ")
-print(alpha_cf_geral_efa$alpha.drop$raw_alpha)
-```
-
-Fator geral apresenta bons indices de precisão
-
-Foi avaliado também a situação
-
-```{r}
-df_competencias_emocionais$cf1 <- rowMeans(df_cf1)
-df_competencias_emocionais$cf2 <- rowMeans(df_cf2)
-df_competencias_emocionais$cf3 <- rowMeans(df_cf3)
-df_competencias_emocionais$cf4 <- rowMeans(df_cf4)
-df_competencias_emocionais$cf5 <- rowMeans(df_cf5)
-
-df_competencias_emocionais$cf_geral <- df_competencias_emocionais %>% select(cf_geral_index) %>% rowMeans()
-```
+O 6 fator que apareceu concatena os itens 3 e 16: "Por mais que tente, não consigo controlar a expressão do que estou sentindo." e "Frustrações deixam-me desanimado/a por bastante tempo.". Esses fatores se relacionam com algum aspecto de Regulações de Emoções. No entanto, apenas 2 itens para esse fator, não o mostra como um fator válido. Assim, visto que o ajuste fatorial não foi suficientemente melhor, não se encontra evidências sufiente para continuar essa investigação. Sugere-se o modelo inicialmente proposto, com atenção as questões de precisão.
