@@ -18,7 +18,13 @@ library(psych)
 library(lavaan)
 ```
 
-## R Markdown
+## Medindo Competências Emocionais
+
+Assim como no instrumento de Impulsividade, precisamos medir os escores dos fatores para Competências Emocioanis. Geralmente, não precisamos usar código muito sofisticado ou refazer análises. Confiamos no estudos que geraram esse intrumentos e apenas extraímos as pontuações conforme indicado no seu manual. No entanto, como poderão olhar mais para frente nessa análise, se mostrou válido remodelar o inventário uma vez que alguns fatores apresentaram valores acima do esperado para erros de medida.
+
+Dessa forma, buscando respeitar os estudos anteriores, essa medição gerará duas bases de dados com escores para cada fator, um buscando seguir o modelo sugerido no estudo anterior, e outro seguindo parametros mais rigorosos de ajuste e precisão.
+
+Ao final, haverá um resumo da precisão e conteúdo dos fatores para cada modelo, como forma de embasar e dar mais possibilidades para os estudos que iremos realizar mais a diante.
 
 ```{r}
 # importando dados para uma variável
@@ -40,6 +46,7 @@ df_competencias_emocionais <- df[,52:85]
 
 ```{r}
 # Conferindo dados de referência
+# Conferindo código usado em estudo anterior
 
 HSE_AP <- read_excel("Base de dados/HSE_AP.xlsx")
 
@@ -60,7 +67,8 @@ df_referencia <- HSE_AP[,12:45]
 # df_geral$CF5 <- df_geral %>% select(136,20,24,28,31,36,45) %>% rowMeans()
 # df_geral$C_GERAL <- df_geral %>% select(139:143) %>% rowMeans()
 
-# o item 28 (interido em 138) aparece tanto no CF5 quanto CF3?
+
+# o item 19 está repetindo no fator 1 e 3?
 ```
 
 ```{r}
@@ -71,16 +79,293 @@ cf3_index <- c(17,19,28 + 11,43) - 11
 cf4_index <- c(13,18,21,23,30,33,44) - 11
 cf5_index <- c(3 + 11, 20,24,31,36,45) - 11
 
-# percebendo que o item 28 irá aparecer no cf1 e no cf3
 # refazer a análise fatorial se mostra válido para tirar dúvidas quanto a estrutura dos fatores
 
 cf_geral_index <- c(cf1_index, cf2_index, cf3_index, cf4_index, cf5_index)
 
 ```
 
-# EFA
+```{r}
+# Preparando dados para medida
 
-Com base no que pude observar, existiam dúvidas sobre a real estrutura dos dados. A melhor maneira de resolver esses questionamentos é refazendo as análises e reintrepretando os fatores encontrados.
+# separando data frame
+df_competencias_emocionais <- df[,52:85]
+
+# invertendo itens
+itens_invertidos_index <- c(3, 16, 28)
+
+for (index in itens_invertidos_index) {
+  df_competencias_emocionais[, index] <- 6 - df_competencias_emocionais[, index]
+}
+
+# seprando dataframes para investigação de conteúdo e precisão
+df_cf1 <- df_competencias_emocionais %>% select(cf1_index)
+df_cf2 <- df_competencias_emocionais %>% select(cf2_index)
+df_cf3 <- df_competencias_emocionais %>% select(cf3_index)
+df_cf4 <- df_competencias_emocionais %>% select(cf4_index)
+df_cf5 <- df_competencias_emocionais %>% select(cf5_index)
+df_cf_geral <- df_competencias_emocionais %>% select(cf_geral_index)
+```
+
+## Fator 1 - Regulação de emoções em outros
+
+```{r}
+colnames(df_cf1)
+```
+
+```{r}
+alpha_cf1 <- alpha(df_cf1)
+print(paste("Alpha para esse fator 1: ", alpha_cf1$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_cf1$alpha.drop$raw_alpha)
+```
+
+## Fator 2 - Regulação de Emoções em si mesmo Baixa Potência
+
+```{r}
+colnames(df_cf2)
+```
+
+```{r}
+alpha_cf2 <- alpha(df_cf2)
+print(paste("Alpha para esse fator 1: ", alpha_cf2$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_cf2$alpha.drop$raw_alpha)
+```
+
+## Fator 3 - Expressão de Emoções?
+
+```{r}
+colnames(df_cf3)
+```
+
+```{r}
+alpha_cf3 <- alpha(df_cf3)
+print(paste("Alpha para esse fator 1: ", alpha_cf3$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_cf3$alpha.drop$raw_alpha)
+```
+
+Aqui parece haver alguma coisa errada. O item "Sei como acalmar uma pessoa eufórica, sem desanimá-la" parece destoar do restante dos outros itens. O cojunto dos itens parece indicar Expressão de Emoções, enquanto esse item parece medir regulação de Emoções em outras pessoas.
+
+## Fator 4 - Percepção de Emoções
+
+```{r}
+colnames(df_cf4)
+```
+
+```{r}
+alpha_cf4 <- alpha(df_cf4)
+print(paste("Alpha para esse fator 1: ", alpha_cf4$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_cf4$alpha.drop$raw_alpha)
+```
+
+## Fator 5 - ?
+
+```{r}
+colnames(df_cf5)
+```
+
+```{r}
+alpha_cf5 <- alpha(df_cf5)
+print(paste("Alpha para esse fator 1: ", alpha_cf5$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_cf5$alpha.drop$raw_alpha)
+```
+
+Para esse último fator, o cojunto de itens não aparenta indicar claramente um fator em questão. Existem itens variados que se relacionam com Regulação de Emoções e Compreensão de Emoções. Alem disso, não apresentou precisão aceitável para ser usado como instrumento de medida.
+
+## Fator geral
+
+```{r}
+ # calcular fator geral
+alpha_geral <- alpha(df_cf_geral)
+print(paste("Alpha para esse fator 1: ", alpha_geral$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_geral$alpha.drop$raw_alpha)
+```
+
+# E agora?
+
+Nesse momento, percebi que os indexes dos items indicados para cada fator poderiam estar equivocados. Para confirmar a escolha de itens sugeridas no estudo anterior, irei fazer uma análise fatorial rapidinho apenas para confirmar os indexes que parecem estar repetidos.
+
+```{r}
+# Separando novo dataframe 
+df_competencias_emocionais <- df[,52:85]
+
+# identificando número de colunas
+num_columns <- ncol(df_competencias_emocionais)
+
+# substituindo nomes das colunas por nomes padronizados
+new_names <- character()
+for (i in 1:num_columns) {
+  new_names[i] <- paste0("ce", i)
+}
+colnames(df_competencias_emocionais) <- new_names
+```
+
+```{r}
+# Análise fatorial exploratória  segundo modelo teórico de 5 fatores
+efa_teste<- fa(df_competencias_emocionais, nfactors = 5, rotate = "oblimin", fm = "wls")
+efa_teste$e.values
+```
+
+```{r}
+plot(efa_teste$e.values)
+```
+
+Os autovalores indicam a adoção de 6 fatores. ScreePlot indica através da técnica do cotovelo indica 5 fatores, assim como modelo teórico.
+
+```{r}
+summary(efa_teste)
+```
+
+Parametros indicam excelente ajuste fatorial. TLI \> 0.900, RMSA \< 0.05, RMSEA \< 0.05.
+
+```{r}
+fa.sort(efa_teste$loadings)
+```
+
+```{r}
+# cf1_index
+# 1  5  8 15 23 26 29 31
+# cf2_index
+# 4 11 14 16 21 24 27
+# cf3_index
+# 6  8 28 32
+# cf4_index
+# 2  7 10 12 19 22 33
+# cf5_análise
+#  3  9 13 20 25 34
+
+cf1_teste_index <- c(1, 5, 8, 15, 23, 26, 29, 31)
+cf2_teste_index <- c(4, 11, 14, 16, 21, 24, 27)
+# na análise seria o fator 4
+cf3_teste_index <- c(6, 18, 28, 32)
+# na anlaise seria o fator 3
+cf4_teste_index <- c(2, 7, 10, 12, 19, 22, 33)
+cf5_teste_index <- c(13, 30, 25)
+
+cf_geral_teste_index <- c(cf1_teste_index, cf2_teste_index, cf3_teste_index, cf4_teste_index, cf5_teste_index)
+
+```
+
+Quando análisamos os indexes que compoem os fatores percebemos algumas semelhanças e diferenças. Os fatores 1, 2 e 4 apresentaram os mesmos itens. A diferença pode ser pecebida nos fatores 3 e 5, justamente os mais problemáticos em relação a erros de medida. Vamos calcular reavaliar esses construtos e verificar se houve melhorias.
+
+```{r}
+df_competencias_emocionais <- df[,52:85]
+
+# invertendo itens
+itens_invertidos_index <- c(3, 16, 28)
+
+for (index in itens_invertidos_index) {
+  df_competencias_emocionais[, index] <- 6 - df_competencias_emocionais[, index]
+}
+
+# seprando dataframes para investigação de conteúdo e precisão
+df_cf3 <- df_competencias_emocionais %>% select(cf3_teste_index)
+df_cf5 <- df_competencias_emocionais %>% select(cf5_teste_index)
+
+df_cf_teste_geral <- df_competencias_emocionais %>% select(cf_geral_teste_index)
+```
+
+## Novo fator 3 - Expressão de Emoções
+
+```{r}
+colnames(df_cf3)
+```
+
+```{r}
+alpha_cf3_novo <- alpha(df_cf3)
+print(paste("Alpha para esse fator 1: ", alpha_cf3_novo$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_cf3_novo$alpha.drop$raw_alpha)
+```
+
+Agora podemos perceber que o fator relacionado a expressão de emoções está melhor delieado, inclusive com índece de erro de medida aprimorado, como era de se esperar.
+
+## Novo fator 5 - Regulação de Emoções em si mesmo de Alta Potência
+
+```{r}
+colnames(df_cf5)
+```
+
+```{r}
+alpha_cf5_novo <- alpha(df_cf5)
+print(paste("Alpha para esse fator 1: ", alpha_cf5_novo$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_cf5_novo$alpha.drop$raw_alpha)
+```
+
+## Fator geral
+
+```{r}
+alpha_cf_geral_novo <- alpha(df_cf_teste_geral)
+print(paste("Alpha para esse fator 1: ", alpha_cf_geral_novo$total$raw_alpha))
+
+print("Alpha em caso de drop do item no Index I: ")
+print(alpha_cf_geral_novo$alpha.drop$raw_alpha)
+```
+
+# Resumindo modelo 5 Fatores
+
+-   Fator 1 - Regulacão de Emoções em Outros (REO)
+
+    -   Alpha = 0.878
+
+-   Fator 2 - Regulação de Emoções em si mesmo de Baixa Potência (RESBP)
+
+    -   Alpha = 0.837
+
+-   Fator 3 - Expressão de Emoções (EE)
+
+    -   Alpha = 0.734
+
+-   Fator 4 - Percepção de Emoções (PE)
+
+    -    Alpha = 0.771
+
+-   Fator 5 - Regulação de Emoções em si mesmo de Alta Potência (RESAP)
+
+    -   Alpha = 0.618
+
+-   Fator geral - Competência Emocional Geral (CEG)
+
+    -   Alpha = 0.889
+
+```{r}
+# Salvando escores num novo dataframe
+REO <- df_cf1 %>% rowMeans() %>% round(3)
+RESBP <- df_cf2 %>%  rowMeans() %>% round(3)
+EE <- df_cf3 %>% rowMeans() %>% round(3)
+PE <- df_cf4 %>% rowMeans() %>% round(3)
+RESAP <- df_cf5 %>% rowMeans() %>% round(3)
+CEG <- df_cf_teste_geral %>% rowMeans() %>% round(3)
+
+escores_5fatores <- data.frame(REO, RESBP, EE, PE, RESAP, CEG)
+escores_5fatores
+```
+
+```{r}
+# Exportando Resuktados
+
+write.csv(escores_5fatores, "Base de dados/Escores Competências Emocionais.csv", row.names=TRUE)
+```
+
+# !! Trabalhando ainda !!
+
+# Testando outra EFA
+
+Com base no que pude observar, poderiam dúvidas dúvidas sobre a real estrutura dos dados. A melhor maneira de resolver esses questionamentos é refazendo as análises e reintrepretando os fatores encontrados.
 
 ```{r}
 # separando novo dataframe
@@ -131,8 +416,12 @@ print(efa5$values)
 Quando observamos observamos que indepedente do modelo ser com 4 ou 5 fatores, apenas 4 fatores apresentam autovalores acima de 1. A técnica de scree plot se mostra dúbia entre 4 ou 5 fatores. O valor reduzido para o 5 autovalor se mostrou determinante nessa análise para a escolha de extração de 4 fatores.
 
 ```{r}
-efa_loadings <- efa$loadings
-print(fa.sort(efa_loadings))
+summary(efa4)
+```
+
+```{r}
+efa_loadings <- efa4$loadings
+fa.sort(efa_loadings)
 ```
 
 ```{r}
