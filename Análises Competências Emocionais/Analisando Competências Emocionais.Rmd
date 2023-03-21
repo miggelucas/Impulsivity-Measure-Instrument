@@ -198,22 +198,22 @@ Nesse momento, percebi que os indexes dos items indicados para cada fator poderi
 
 ```{r}
 # Separando novo dataframe 
-df_competencias_emocionais <- df[,52:85]
+df_efa <- df[,52:85]
 
 # identificando número de colunas
-num_columns <- ncol(df_competencias_emocionais)
+num_columns <- ncol(df_efa)
 
 # substituindo nomes das colunas por nomes padronizados
 new_names <- character()
 for (i in 1:num_columns) {
   new_names[i] <- paste0("ce", i)
 }
-colnames(df_competencias_emocionais) <- new_names
+colnames(df_efa) <- new_names
 ```
 
 ```{r}
 # Análise fatorial exploratória  segundo modelo teórico de 5 fatores
-efa_teste<- fa(df_competencias_emocionais, nfactors = 5, rotate = "oblimin", fm = "wls")
+efa_teste<- fa(df_efa, nfactors = 5, rotate = "oblimin", fm = "wls")
 efa_teste$e.values
 ```
 
@@ -332,7 +332,7 @@ print(alpha_cf_geral_novo$alpha.drop$raw_alpha)
 
 -   Fator 4 - Percepção de Emoções (PE)
 
-    -    Alpha = 0.771
+    -   Alpha = 0.771
 
 -   Fator 5 - Regulação de Emoções em si mesmo de Alta Potência (RESAP)
 
@@ -403,24 +403,21 @@ plot(fa.parallel(df_efa, fm = "wls", fa = "fa"))
 ```
 
 ```{r}
-efa5 <- fa(df_efa, nfactors = 5, rotate = "oblimin", fm = "wls", cor = "poly")
-efa4 <- fa(df_efa, nfactors = 4, rotate = "oblimin", fm = "wls", cor = "poly")
+efa6 <- fa(df_efa, nfactors = 6, rotate = "oblimin", fm = "wls")
 
-print("autovalores para modelo com 4 fatores")
-print(efa4$values)
-
-print("autovalores para modelo com 5 fatores")
-print(efa5$values)
+print("autovalores para modelo com 6 fatores")
+print(efa4$e.values)
+efa4$va
 ```
 
 Quando observamos observamos que indepedente do modelo ser com 4 ou 5 fatores, apenas 4 fatores apresentam autovalores acima de 1. A técnica de scree plot se mostra dúbia entre 4 ou 5 fatores. O valor reduzido para o 5 autovalor se mostrou determinante nessa análise para a escolha de extração de 4 fatores.
 
 ```{r}
-summary(efa4)
+summary(efa6)
 ```
 
 ```{r}
-efa_loadings <- efa4$loadings
+efa_loadings <- efa6$loadings
 fa.sort(efa_loadings)
 ```
 
