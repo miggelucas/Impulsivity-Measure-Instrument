@@ -21,7 +21,7 @@ df$TCLE[df$TCLE == 'Não concordo'] <- '0'
 df <- df %>% filter(TCLE==1) # Eliminação de não respondentes
 
 # saparando intrumetnos de impulsividade
-df_impulsividade <- df[, 10:51] 
+df_impulsividade <- df[, 10:51]
 
 # Definir o número de colunas a serem renomeadas
 num_cols <- 42
@@ -103,6 +103,12 @@ print(numeros)
 
 # AFE_2 -------------------------------------------------------------------
 
+# Itens reduzidos
+df_impulsividade_2 <- df_impulsividade %>% select(1,2,3,4,8,9,10,11,12,13,
+                                                  14,15,18,19,22,23,24,26,
+                                                  27,28,29,30,31,32,33,34,
+                                                  36,38,39,41,42)
+
 # Paralell analysis
 
 poly_im <- df_impulsividade_2 %>% polychoric(.)   # matriz de correlações policóricas para análise paralela.
@@ -114,31 +120,67 @@ pa_R$fa.values #mostra os eigenvalues com os dados experimentais
 pa_R$fa.sim #mostra os eigenvalues com os dados simulados
 
 
-# Fatores
+# Teste do modelo com 4 fatores
 im_efa <- fa(df_impulsividade_2, nfactors = '4', cor='poly', 
             fm='wls', rotate = 'geominQ')
 
 im_efa$e.values
 im_efa$loadings
 
-# Fatores
+# Teste do modelo com 3 fatores
 im_efa_2 <- fa(df_impulsividade_2, nfactors = '3', cor='poly', 
              fm='wls', rotate = 'geominQ')
 
 im_efa_2$e.values
 im_efa_2$loadings %>% view()
 
-# Fatores
+# Teste do modelo com 6 fatores
 im_efa_3 <- fa(df_impulsividade_2, nfactors = '6', cor='poly', 
              fm='wls', rotate = 'geominQ')
 
 im_efa_3$e.values
 im_efa_3$loadings %>% view()
 
-# Fatores
+# Teste do modelo com 7 fatores
 im_efa_4 <- fa(df_impulsividade_2, nfactors = '7', cor='poly', 
              fm='wls', rotate = 'geominQ')
 
 im_efa_4$e.values
 im_efa_4$loadings
 
+names(df_impulsividade_2)
+
+# Fator 1
+# Item 7 é negativo
+df_impulsividade_2 %>% select(3,5,7:11) %>% psych::omega()
+df_impulsividade_2 %>% select(3,5,7:11) %>% psych::alpha(check.keys = TRUE)
+
+# Fator 2
+# Item 18 é negativo
+df_impulsividade_2 %>% select(4,17,18,20:22,24,25,27:30) %>% psych::omega()
+df_impulsividade_2 %>% select(4,17,18,20:22,24,25,27:30) %>% psych::alpha(check.keys = TRUE)
+
+# Fator 3
+df_impulsividade_2 %>% select(1:2,6,12:16,23,26) %>% psych::omega()
+df_impulsividade_2 %>% select(1:2,6,12:16,23,26) %>% psych::alpha(check.keys = TRUE)
+
+# Inverter itens negativos
+df_impulsividade_2$H_7 <- ifelse(df_impulsividade_2$`Costumo realizar minhas atividades sem perder o foco.` == 1, 5,
+                                 ifelse(df_impulsividade_2$`Costumo realizar minhas atividades sem perder o foco.` == 2, 4,
+                                        ifelse(df_impulsividade_2$`Costumo realizar minhas atividades sem perder o foco.` == 4, 2,
+                                               ifelse(df_impulsividade_2$`Costumo realizar minhas atividades sem perder o foco.` == 5, 1, df_impulsividade_2$`Costumo realizar minhas atividades sem perder o foco.`))))
+
+df_impulsividade_2$H_18 <- ifelse(df_impulsividade_2$`Em conversas com amigos, penso antes de falar.` == 1, 5,
+                                 ifelse(df_impulsividade_2$`Em conversas com amigos, penso antes de falar.` == 2, 4,
+                                        ifelse(df_impulsividade_2$`Em conversas com amigos, penso antes de falar.` == 4, 2,
+                                               ifelse(df_impulsividade_2$`Em conversas com amigos, penso antes de falar.` == 5, 1, df_impulsividade_2$`Em conversas com amigos, penso antes de falar.`))))
+
+# Cálculo dos fatores de impulsividade
+# Fator 1
+df_impulsividade_2$F_IM1 <- df_impulsividade_2 %>% select(3,5,8:11,32) %>% rowMeans()
+
+# Fator 2
+df_impulsividade_2$F_IM2 <- df_impulsividade_2 %>% select(4,17,20:22,24,25,27:30,33) %>% rowMeans()
+
+# Fator 3
+df_impulsividade_2$F_IM3 <- df_impulsividade_2 %>% select(1:2,6,12:16,23,26) %>% rowMeans()
