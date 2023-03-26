@@ -7,7 +7,6 @@ library(readxl)
 
 
 # importando dados
-df <- read_csv("Construção de Instrumentos 2022.2 (respostas) - Respostas ao formulário 1-3.csv")
 df <- read_xlsx("Construção de Instrumentos 2022.2 (respostas).xlsx")
 
 # Renomear
@@ -196,3 +195,19 @@ df_geral$RESAP <- RESAP
 df_geral$CEG <- CEG
 
 df_geral <- bind_cols(df_geral, select(df_impulsividade_2, "F_IM1", "F_IM2", "F_IM3"))
+
+names(df_geral)
+
+ggplot(df_pf, aes(x = Idade, y = Total))+
+  geom_point(size=1.5)+
+  labs(y = "Resultado do Teste")+
+  theme_classic()
+
+matriz_cor <- df_geral %>% select(86:94) %>% cor(method = "pearson") %>% round(2)
+view(matriz_cor)
+
+
+corrplot::corrplot(matriz_cor, method = "number")
+
+corrplot::corrplot(matriz_cor, method = "circle",
+                   type = "upper", order = "hclust",)
