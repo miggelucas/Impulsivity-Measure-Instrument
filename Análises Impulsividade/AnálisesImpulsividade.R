@@ -184,3 +184,15 @@ df_impulsividade_2$F_IM2 <- df_impulsividade_2 %>% select(4,17,20:22,24,25,27:30
 
 # Fator 3
 df_impulsividade_2$F_IM3 <- df_impulsividade_2 %>% select(1:2,6,12:16,23,26) %>% rowMeans()
+
+# Copiando o banco df para df_geral, com a finalidade de salvar os escores dos fatores de impulsividade e CE
+df_geral <- df
+
+df_geral$REO <- REO
+df_geral$RESBP <- RESBP
+df_geral$EE <- EE
+df_geral$PE <- PE
+df_geral$RESAP <- RESAP
+df_geral$CEG <- CEG
+
+df_geral <- bind_cols(df_geral, select(df_impulsividade_2, "F_IM1", "F_IM2", "F_IM3"))
