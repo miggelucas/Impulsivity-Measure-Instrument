@@ -4,6 +4,7 @@ author: "Emanuel Cordeiro"
 date: "3/26/2023"
 output: html_document
 ---
+# Carregamento dos pacotes de dados  
 
 ```{r}
 library(readr)
@@ -14,9 +15,12 @@ library(tidyverse)
 library(readxl)
 ```
 
+# Carregando o banco de Impulsividade
 ```{r}
 df <- read_xlsx("Base de dados/Construção de Instrumentos 2022.2 (respostas).xlsx")
 ```
+
+- Organizando as variáveis do banco df que contém os dois instrumentos  
 
 ```{r}
 # Renomear
@@ -34,11 +38,13 @@ df$TCLE[df$TCLE == 'Não concordo'] <- '0'
 df <- df %>% filter(TCLE==1) # Eliminação de não respondentes
 ```
 
+# Separando o banco de impulsividade
 ```{r}
 # saparando intrumetnos de impulsividade
 df_impulsividade <- df[, 10:51]
 ```
 
+- Em um análise fatorial anterior foi identificado que apenas 31 itens deveriam continuar nas análises. Dessa forma, foi construido o banco de impulsividade_2 com essa finalidade.
 ```{r}
 # Itens reduzidos
 df_impulsividade_2 <- df_impulsividade %>% select(1,2,3,4,8,9,10,11,12,13,
@@ -47,6 +53,7 @@ df_impulsividade_2 <- df_impulsividade %>% select(1,2,3,4,8,9,10,11,12,13,
                                                   36,38,39,41,42)
 ```
 
+- Teste do modelo fatorial com o modelo de 3 fatores já com a redução dos itens.
 ```{r}
 # Teste do modelo com 3 fatores
 im_efa_2 <- fa(df_impulsividade_2, nfactors = '3', cor='poly', 
@@ -55,6 +62,10 @@ im_efa_2 <- fa(df_impulsividade_2, nfactors = '3', cor='poly',
 im_efa_2$e.values
 im_efa_2$loadings %>% view()
 ```
+
+# Análise de confiabilidade
+  
+- Análise de confiabilidade a partir do alfa e Omega para os 3 fatores do modelo. Importante ressaltar que na análise anterior 2 itens não apresentaram boas cargas fatoriais. Por isso, a escala final ficou com 29 itens. Desses itens, o item 7 e o item 18 são negativos e precisam ser invertidos.  
 
 ```{r}
 # Fator 1
@@ -72,6 +83,8 @@ df_impulsividade_2 %>% select(1:2,6,12:16,23,26) %>% psych::omega()
 df_impulsividade_2 %>% select(1:2,6,12:16,23,26) %>% psych::alpha(check.keys = TRUE)
 ```
 
+- Inversão dos itens  
+
 ```{r}
 # Inverter itens negativos
 df_impulsividade_2$H_7 <- ifelse(df_impulsividade_2$`Costumo realizar minhas atividades sem perder o foco.` == 1, 5,
@@ -84,7 +97,9 @@ df_impulsividade_2$H_18 <- ifelse(df_impulsividade_2$`Em conversas com amigos, p
                                         ifelse(df_impulsividade_2$`Em conversas com amigos, penso antes de falar.` == 4, 2,
                                                ifelse(df_impulsividade_2$`Em conversas com amigos, penso antes de falar.` == 5, 1, df_impulsividade_2$`Em conversas com amigos, penso antes de falar.`))))
 ```
-
+  
+# Calculando os fatores de impulsividade  
+- Os itens 32 e 33 são os itens invertidos
 ```{r}
 # Cálculo dos fatores de impulsividade
 # Fator 1
@@ -97,19 +112,40 @@ df_impulsividade_2$F_IM2 <- df_impulsividade_2 %>% select(4,17,20:22,24,25,27:30
 df_impulsividade_2$F_IM3 <- df_impulsividade_2 %>% select(1:2,6,12:16,23,26) %>% rowMeans()
 ```
 
+- Criando uma cópia do df
+
 ```{r}
 # Copiando o banco df para df_geral, com a finalidade de salvar os escores dos fatores de impulsividade e CE
 df_geral <- df
 ```
 
+# Carregando o banco com os fatores de CE
+
+- Em outro arquivo, foi realizado as análises do instrumento de competências emocionais. Nessa etapa, está sendo carregado apenas o banco com os fatores obtidos da análise de CE.
+
 ```{r}
 df_CE <- read_csv("Base de dados/Escores Competências Emocionais.csv")
 ```
+
+- Colocando os fatores de impulsividade e competências emocionais no banco df_geral  
 
 ```{r}
 df_geral <- bind_cols(df_geral, select(df_CE, "REO", "RESBP", "EE", "PE", "RESAP", "CEG"))
 df_geral <- bind_cols(df_geral, select(df_impulsividade_2, "F_IM1", "F_IM2", "F_IM3"))
 ```
+
+# Matrizes de correlação  
+
+- Construindo uma matriz de correlação entre os fatores de impulsividade e CE com a finalidade de testar a validade de critério.  
+
+```{r}
+matriz_cor <- df_geral %>% select(86:94) %>% cor(method = "pearson") %>% round(2)
+
+testRes <-  corrplot::cor.mtest(matriz_cor, conf.level = 0.95) 
+corrplot::corrplot(matriz_cor, method = "number", p.mat = testRes$p, sig.level = 0.05, type = "upper",
+                   number.cex = 0.8)
+```
+
 
 
 
