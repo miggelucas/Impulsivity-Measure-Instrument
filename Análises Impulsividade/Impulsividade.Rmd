@@ -2,7 +2,10 @@
 title: "Impulsividade"
 author: "Emanuel Cordeiro"
 date: "3/26/2023"
-output: html_document
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
 ---
 # Carregamento dos pacotes de dados  
 
@@ -53,7 +56,11 @@ df_impulsividade_2 <- df_impulsividade %>% select(1,2,3,4,8,9,10,11,12,13,
                                                   36,38,39,41,42)
 ```
 
-- Teste do modelo fatorial com o modelo de 3 fatores já com a redução dos itens.
+- Teste do modelo fatorial com o modelo de 3 fatores já com a redução dos itens.  
+O **primeiro fator** se refere a falta de concentração.  
+O **segundo fator** ainda precisa ser nomeado.  
+O **terceiro fator** se refere a planejamento.  
+
 ```{r}
 # Teste do modelo com 3 fatores
 im_efa_2 <- fa(df_impulsividade_2, nfactors = '3', cor='poly', 
@@ -137,6 +144,13 @@ df_geral <- bind_cols(df_geral, select(df_impulsividade_2, "F_IM1", "F_IM2", "F_
 # Matrizes de correlação  
 
 - Construindo uma matriz de correlação entre os fatores de impulsividade e CE com a finalidade de testar a validade de critério.  
+  
+Nessa etapa, observa-se que alguns fatores de competências emocionais tiveram uma relação negativa com o primeiro fator de impulsividade, e alguns outros
+fatores do CE tiveram relação positiva com o terceiro fator de impulsividade.  
+
+Parece haver um sentido teórico, haja vista que o primeiro fator se refere a falta de concentração, indicando que baixa concentração nas atividade pode ter relação com menores níveis de competências emocionais. De modo contrário, maiores níveis de competências emocionais se relaciona com maior planejamento para as atividades.
+
+- Esses resultados indicam **validade externa** ao instrumento. 
 
 ```{r}
 matriz_cor <- df_geral %>% select(86:94) %>% cor(method = "pearson") %>% round(2)
