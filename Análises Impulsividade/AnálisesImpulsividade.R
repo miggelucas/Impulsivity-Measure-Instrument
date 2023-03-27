@@ -7,7 +7,7 @@ library(readxl)
 
 
 # importando dados
-df <- read_xlsx("Construção de Instrumentos 2022.2 (respostas).xlsx")
+df <- read_xlsx("Base de dados/Construção de Instrumentos 2022.2 (respostas).xlsx")
 
 # Renomear
 df <- df %>% rename(TCLE = "Tendo em vista os itens acima apresentados, eu, de forma livre e esclarecida, manifesto meu consentimento para participar da pesquisa.")
