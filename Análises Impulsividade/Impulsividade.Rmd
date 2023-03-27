@@ -11,7 +11,7 @@ output:
 
 # Carregamento dos pacotes de dados
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(readr)
 library(psych)
 library(lavaan)
@@ -67,13 +67,26 @@ colnames(df_impulsividade_2)
     O **segundo fator** ainda precisa ser nomeado.\
     O **terceiro fator** se refere a planejamento.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
+
+# renomeando colunas
+df_impulsividade_efa <- df_impulsividade_2
+
+num_columns <- ncol(df_impulsividade_efa)
+# laço para criar e manter novos nomes
+new_names <- character()
+for (i in 1:num_columns) {
+  new_names[i] <- paste0("impul", i)
+}
+
+colnames(df_impulsividade_efa) <- new_names
+
+
 # Teste do modelo com 3 fatores
-im_efa_2 <- fa(df_impulsividade_2, nfactors = '3', cor='poly', 
+im_efa_2 <- fa(df_impulsividade_efa, nfactors = '3', cor='poly', 
              fm='wls', rotate = 'geominQ')
 
 plot(im_efa_2$e.values)
-
 ```
 
 ```{r}
@@ -199,7 +212,7 @@ df_geral <- df
 
 -   Em outro arquivo, foi realizado as análises do instrumento de competências emocionais. Nessa etapa, está sendo carregado apenas o banco com os fatores obtidos da análise de CE.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 df_CE <- read_csv("Base de dados/Escores Competências Emocionais.csv")
 ```
 
