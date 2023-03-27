@@ -3,9 +3,9 @@ title: "Impulsividade"
 author: "Emanuel Cordeiro"
 date: "3/26/2023"
 output:
+  html_document: default
   pdf_document: 
     toc_depth: 1
-  html_document: default
   word_document: default
 ---
 
@@ -81,7 +81,7 @@ plot(im_efa_2$e.values)
 summary(im_efa_2)
 ```
 
-```{r, paged.print=FALSE}
+```{r paged.print=FALSE}
 # Observando cargas fatoriais
 data.frame(fa.sort(im_efa_2)$loadings[,1:3])
 
@@ -91,7 +91,7 @@ data.frame(fa.sort(im_efa_2)$loadings[,1:3])
 
 -   Análise de confiabilidade a partir do alfa e Omega para os 3 fatores do modelo. Importante ressaltar que na análise anterior 2 itens não apresentaram boas cargas fatoriais. Por isso, a escala final ficou com 29 itens. Desses itens, o item 7 e o item 18 são negativos e precisam ser invertidos.
 
-## Fator 1
+## Fator 1 - Falta de Concentração
 
 ```{r paged.print=FALSE}
 # Fator 1
@@ -115,7 +115,7 @@ print(alpha1$total)
 alpha1$alpha.drop[,1:2]
 ```
 
-## Fator 2 -
+## Fator 2 - Impulsividade
 
 ```{r}
 # item 18 é invertido
@@ -136,7 +136,7 @@ print(alpha2$total)
 alpha2$alpha.drop[,1:2]
 ```
 
-## Fator 3
+## Fator 3 - Planejamento
 
 ```{r}
 #df_impulsividade_2 %>% select(1:2,6,12:16,23,26)
@@ -157,7 +157,9 @@ alpha3$total
 alpha3$alpha.drop[,1:2]
 ```
 
--   Inversão dos itens
+# Calculando os fatores de impulsividade
+
+Inversão dos itens
 
 ```{r}
 # Inverter itens negativos
@@ -171,8 +173,6 @@ df_impulsividade_2$H_18 <- ifelse(df_impulsividade_2$`Em conversas com amigos, p
                                         ifelse(df_impulsividade_2$`Em conversas com amigos, penso antes de falar.` == 4, 2,
                                                ifelse(df_impulsividade_2$`Em conversas com amigos, penso antes de falar.` == 5, 1, df_impulsividade_2$`Em conversas com amigos, penso antes de falar.`))))
 ```
-
-# Calculando os fatores de impulsividade
 
 -   Os itens 32 e 33 são os itens invertidos
 
