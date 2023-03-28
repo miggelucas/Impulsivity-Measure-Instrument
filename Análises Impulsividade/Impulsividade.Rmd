@@ -208,6 +208,18 @@ df_impulsividade_2$F_IM3 <- df_impulsividade_2 %>% select(1:2,6,12:16,23,26) %>%
 df_geral <- df
 ```
 
+# Salvando escores num arquivo separado
+
+```{r}
+
+escores_impulsividade <- data.frame(falta_de_atencao = df_impulsividade_2$F_IM1,
+                                    impulsividade = df_impulsividade_2$F_IM2,
+                                    planejamento = df_impulsividade_2$F_IM3
+                                    )
+
+#write.csv(escores_impulsividade, "Base de dados/escores_impulsividade.csv")
+```
+
 # Carregando o banco com os fatores de CE
 
 -   Em outro arquivo, foi realizado as análises do instrumento de competências emocionais. Nessa etapa, está sendo carregado apenas o banco com os fatores obtidos da análise de CE.
