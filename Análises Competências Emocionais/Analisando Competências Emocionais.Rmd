@@ -140,7 +140,7 @@ colnames(df_cf1)
 ```
 
 ```{r}
-alpha_cf1 <- alpha(df_cf1)
+alpha_cf1 <- psych :: alpha(df_cf1)
 print(paste("Alpha para esse fator 1: ", alpha_cf1$total$raw_alpha))
 
 print("Alpha em caso de drop do item no Index I: ")
@@ -154,7 +154,7 @@ colnames(df_cf2)
 ```
 
 ```{r}
-alpha_cf2 <- alpha(df_cf2)
+alpha_cf2 <- psych :: alpha(df_cf2)
 print(paste("Alpha para esse fator 1: ", alpha_cf2$total$raw_alpha))
 
 print("Alpha em caso de drop do item no Index I: ")
@@ -168,7 +168,7 @@ colnames(df_cf3)
 ```
 
 ```{r}
-alpha_cf3 <- alpha(df_cf3)
+alpha_cf3 <- psych :: alpha(df_cf3)
 print(paste("Alpha para esse fator 1: ", alpha_cf3$total$raw_alpha))
 
 print("Alpha em caso de drop do item no Index I: ")
@@ -184,7 +184,7 @@ colnames(df_cf4)
 ```
 
 ```{r}
-alpha_cf4 <- alpha(df_cf4)
+alpha_cf4 <- psych :: alpha(df_cf4)
 print(paste("Alpha para esse fator 1: ", alpha_cf4$total$raw_alpha))
 
 print("Alpha em caso de drop do item no Index I: ")
@@ -198,7 +198,7 @@ colnames(df_cf5)
 ```
 
 ```{r}
-alpha_cf5 <- alpha(df_cf5)
+alpha_cf5 <- psych :: alpha(df_cf5)
 print(paste("Alpha para esse fator 1: ", alpha_cf5$total$raw_alpha))
 
 print("Alpha em caso de drop do item no Index I: ")
@@ -211,7 +211,7 @@ Para esse último fator, o cojunto de itens não aparenta indicar claramente um 
 
 ```{r}
  # calcular fator geral
-alpha_geral <- alpha(df_cf_geral)
+alpha_geral <- psych :: alpha(df_cf_geral)
 print(paste("Alpha para esse fator 1: ", alpha_geral$total$raw_alpha))
 
 print("Alpha em caso de drop do item no Index I: ")
@@ -309,7 +309,7 @@ colnames(df_cf3)
 ```
 
 ```{r}
-alpha_cf3_novo <- alpha(df_cf3)
+alpha_cf3_novo <- psych :: alpha(df_cf3)
 print(paste("Alpha para esse fator 1: ", alpha_cf3_novo$total$raw_alpha))
 
 print("Alpha em caso de drop do item no Index I: ")
@@ -325,7 +325,7 @@ colnames(df_cf5)
 ```
 
 ```{r}
-alpha_cf5_novo <- alpha(df_cf5)
+alpha_cf5_novo <- psych :: alpha(df_cf5)
 print(paste("Alpha para esse fator 1: ", alpha_cf5_novo$total$raw_alpha))
 
 print("Alpha em caso de drop do item no Index I: ")
@@ -335,7 +335,7 @@ print(alpha_cf5_novo$alpha.drop$raw_alpha)
 ## Fator geral
 
 ```{r}
-alpha_cf_geral_novo <- alpha(df_cf_teste_geral)
+alpha_cf_geral_novo <- psych :: alpha(df_cf_teste_geral)
 print(paste("Alpha para esse fator 1: ", alpha_cf_geral_novo$total$raw_alpha))
 
 print("Alpha em caso de drop do item no Index I: ")
@@ -394,7 +394,7 @@ escores_5fatores
 ```{r}
 # Exportando Resuktados
 
-write.csv(escores_5fatores, "Base de dados/Escores Competências Emocionais.csv", row.names=TRUE)
+write.csv(escores_5fatores, "Base de dados/escores_competências_emocionais.csv", row.names= FALSE, fileEncoding = "UTF-8")
 ```
 
 # Testando outra EFA

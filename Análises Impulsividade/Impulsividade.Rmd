@@ -217,7 +217,7 @@ escores_impulsividade <- data.frame(falta_de_atencao = df_impulsividade_2$F_IM1,
                                     planejamento = df_impulsividade_2$F_IM3
                                     )
 
-#write.csv(escores_impulsividade, "Base de dados/escores_impulsividade.csv")
+#write.csv(escores_impulsividade, "Base de dados/escores_impulsividade.csv",  row.names=FALSE, fileEncoding = "UTF-8")
 ```
 
 # Carregando o banco com os fatores de CE
