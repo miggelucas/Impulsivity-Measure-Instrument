@@ -394,7 +394,7 @@ escores_5fatores
 ```{r}
 # Exportando Resuktados
 
-write.csv(escores_5fatores, "Base de dados/escores_competências_emocionais.csv", row.names= FALSE, fileEncoding = "UTF-8")
+write.csv(escores_5fatores, "Base de dados/escores_competencias_emocionais.csv", row.names= FALSE, fileEncoding = "UTF-8")
 ```
 
 # Testando outra EFA
