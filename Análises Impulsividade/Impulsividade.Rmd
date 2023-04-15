@@ -72,14 +72,14 @@ colnames(df_impulsividade_2)
 # renomeando colunas
 df_impulsividade_efa <- df_impulsividade_2
 
-num_columns <- ncol(df_impulsividade_efa)
+# num_columns <- ncol(df_impulsividade_efa)
 # laço para criar e manter novos nomes
-new_names <- character()
-for (i in 1:num_columns) {
-  new_names[i] <- paste0("impul", i)
-}
+# new_names <- character()
+#for (i in 1:num_columns) {
+#  new_names[i] <- paste0("impul", i)
+#}
 
-colnames(df_impulsividade_efa) <- new_names
+#colnames(df_impulsividade_efa) <- new_names
 
 
 # Teste do modelo com 3 fatores
@@ -96,7 +96,11 @@ summary(im_efa_2)
 
 ```{r paged.print=FALSE}
 # Observando cargas fatoriais
-data.frame(fa.sort(im_efa_2)$loadings[,1:3])
+df_cargas_fatoriais <- data.frame(fa.sort(im_efa_2)$loadings[,1:3])
+
+write.csv(df_cargas_fatoriais, "Base de dados/cargasFatoriais - efa2.csv",  row.names=TRUE, fileEncoding = "UTF-8")
+
+df_cargas_fatoriais
 
 ```
 
